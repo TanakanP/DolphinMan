@@ -38,6 +38,7 @@ public class GameScreen extends ScreenAdapter{
 	int max_count;
 	int bullet_mul;
 	int score;
+	int bullet_cal;
 	PointerInfo a;
 	Point b;
 	float dum;
@@ -54,7 +55,6 @@ public class GameScreen extends ScreenAdapter{
 	int[] alive = new int[100000];
 	int[] bulletR = new int[1000];
 	int[] bulletS = new int[1000];
-	int[] bullet_cal = new int[1000];
 	int[] bullet_calx = new int[1000];
 	int[] bullet_caly = new int[1000];
 	BitmapFont font = new BitmapFont();
@@ -85,6 +85,14 @@ public class GameScreen extends ScreenAdapter{
 	}
 	
 	public void update(float delta){
+		setUp();
+		dolphinMove();
+		monsterAction();
+		bulletAction();
+		checkStatus();
+	}
+
+	public void setUp(){
 		a = MouseInfo.getPointerInfo();
 		b = a.getLocation();
 		dum = (int) b.getX();
@@ -96,13 +104,21 @@ public class GameScreen extends ScreenAdapter{
 			if(multi==0){multi=1;break;}
 			multi=multi*2;
 		}
-		dolphinMove();
+	}
+	
+	public void monsterAction(){
 		spawnEnemy();
 		monsterMove();
+	}
+	
+	public void bulletAction(){
 		spawnBullet();
 		bulletShoot();
 		bulletMove();
 		bulletHit();
+	}
+	
+	public void checkStatus(){
 		checkDolphinDead();
 		checkMonsterDeadAll();
 	}
@@ -166,8 +182,8 @@ public class GameScreen extends ScreenAdapter{
 					y_E[i]=enemy[i].moveY(y_E[i],pos.y,2);
 				}
 				else if(value1==3){
-					x_E[i]=enemy[i].moveX(x_E[i],pos.x,4);
-					y_E[i]=enemy[i].moveY(y_E[i],pos.y,4);
+					x_E[i]=enemy[i].moveX(x_E[i],pos.x,3);
+					y_E[i]=enemy[i].moveY(y_E[i],pos.y,3);
 				}
 				else{
 					x_E[i]=enemy[i].moveX(x_E[i],pos.x,4);
@@ -200,9 +216,9 @@ public class GameScreen extends ScreenAdapter{
 	public void bulletShoot(){
 		for(int i=0;i<1000;i++){
 			if(bulletS[i]!=0){
-				bullet_cal[i]=(bullet[i].move(x_B[i],bX[i],y_B[i],bY[i])/5);
-				bullet_calx[i]=Math.abs(((x_Brem[i]-bX[i])/bullet_cal[i]));
-				bullet_caly[i]=Math.abs(((y_Brem[i]-bY[i])/bullet_cal[i]));
+				bullet_cal=(bullet[i].move(x_Brem[i],bX[i],y_Brem[i],bY[i])/5);
+				bullet_calx[i]=Math.abs(((x_Brem[i]-bX[i])/bullet_cal));
+				bullet_caly[i]=Math.abs(((y_Brem[i]-bY[i])/bullet_cal));
 				bulletS[i]=0;
 				
 			}
@@ -261,19 +277,14 @@ public class GameScreen extends ScreenAdapter{
 		}
 	}
 	
-	public void render(float delta){
-		update(delta);
-		
-		Gdx.gl.glClearColor(0, 0, 0, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		
+	public void draw(){
 		SpriteBatch batch = dolphinMan.batch;
 		batch.begin();
 		Vector2 pos = dolphin.getPosition();
 		batch.draw(dummyMap,0,0);
 		batch.draw(crossHair,mouseX,mouseY);
 		font.draw(batch, "Shark Eliminated: "+score, 10, 20);
-		font.draw(batch, "ASWD to move, click to shoot, bullet bug yu na ja ", 700, 20);
+		font.draw(batch, "WASD to move, click to shoot, bullet bug yu na ja ", 700, 20);
 		for(int i=0;i<multi;i++){
 			if(alive[i]!=0){
 				batch.draw(shark,x_E[i],y_E[i]);
@@ -287,5 +298,14 @@ public class GameScreen extends ScreenAdapter{
 		if(x==1){batch.draw(dolphinLeft,pos.x,pos.y);}
 		else{batch.draw(dolphinRight,pos.x,pos.y);}
 		batch.end();
+	}
+	
+	public void render(float delta){
+		update(delta);
+		
+		Gdx.gl.glClearColor(0, 0, 0, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		
+		draw();
 	}
 }
