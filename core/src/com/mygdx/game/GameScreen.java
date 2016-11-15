@@ -8,6 +8,7 @@ import java.util.Random;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -28,6 +29,8 @@ public class GameScreen extends ScreenAdapter{
 	Texture shark;
 	Texture crossHair;
 	Texture bulletDolphin;
+	Texture HPborder;
+	Texture HPbar;
 	Enemy[] enemy;
 	Bullet[] bullet;
 	int x;
@@ -41,6 +44,7 @@ public class GameScreen extends ScreenAdapter{
 	int bullet_cal;
 	int monsterMode;
 	int level;
+	int hp=10;
 	PointerInfo a;
 	Point b;
 	float dum;
@@ -62,6 +66,7 @@ public class GameScreen extends ScreenAdapter{
 	int[] bounce = new int[100000];
 	BitmapFont font = new BitmapFont();
 	Random rand = new Random();
+	public Sound mainTheme;
 	
 	
 	public GameScreen (DolphinMan dolphinMan) {
@@ -79,6 +84,10 @@ public class GameScreen extends ScreenAdapter{
 		crossHair = new Texture("crosshair.png");
 		bulletDolphin = new Texture("bulletDolphin.png");
 		dummyMap = new Texture("MapSea.jpg");
+		HPborder = new Texture("HPborder.jpg");
+		HPbar = new Texture("HPbar.jpg");
+		mainTheme = Gdx.audio.newSound(Gdx.files.internal("MainTheme.mp3"));
+		mainTheme.play();
 
 		System.out.println("You enter Game Screen");
 		
@@ -119,6 +128,7 @@ public class GameScreen extends ScreenAdapter{
 	public void checkStatus(){
 		checkDolphinDead();
 		checkMonsterDeadAll();
+		checkEndgame();
 	}
 	
 	public void dolphinMove(){
@@ -140,7 +150,7 @@ public class GameScreen extends ScreenAdapter{
 	
 	public void spawnEnemy(){
 		if(start==0){
-			if(multi<=28){
+			if(multi<=18){
 				multi=multi+2;
 			}
 			for(int i=0;i<multi;i++){
@@ -160,7 +170,7 @@ public class GameScreen extends ScreenAdapter{
 				if(multi<=10){
 					level=3;
 				}
-				else if(multi>10 && multi<=20){
+				else if(multi>10 && multi<=15){
 					level=5;
 				}
 				else{
@@ -252,6 +262,10 @@ public class GameScreen extends ScreenAdapter{
 			Vector2 pos = dolphin.getPosition();
 			if(pos.x+25>=x_E[i]+20 && pos.x+25<=x_E[i]+55){
 				if(pos.y+25>=y_E[i]+18 && pos.y+25<=y_E[i]+52){
+					alive[i]=0;
+					y_E[i]=0;
+					x_E[i]=0;
+					hp--;
 					System.out.print("DIE");
 				}
 			}
@@ -272,13 +286,19 @@ public class GameScreen extends ScreenAdapter{
 		}
 	}
 	
+	public void checkEndgame(){
+		if(hp==0){
+			dolphinMan.setScreen(new GameOver(dolphinMan));
+		}
+	}
+	
 	public void draw(){
 		SpriteBatch batch = dolphinMan.batch;
 		batch.begin();
 		Vector2 pos = dolphin.getPosition();
 		batch.draw(dummyMap,0,0);
 		batch.draw(crossHair,mouseX,mouseY);
-		font.draw(batch, "Shark Eliminated: "+score, 10, 20);
+		font.draw(batch, "Shark Eliminated: "+score, 10, 748);
 		font.draw(batch, "WASD to move, click to shoot, bullet bug yu na ja ", 700, 20);
 		for(int i=0;i<multi;i++){
 			if(alive[i]!=0){
@@ -292,6 +312,11 @@ public class GameScreen extends ScreenAdapter{
 		}
 		if(x==1){batch.draw(dolphinLeft,pos.x,pos.y);}
 		else{batch.draw(dolphinRight,pos.x,pos.y);}
+		batch.draw(HPborder,0,0);
+		for(int i=0;i<hp;i++){
+			batch.draw(HPbar,3+(i*30),3);
+		}
+		font.draw(batch, "HP", 10, 52);
 		batch.end();
 	}
 	
