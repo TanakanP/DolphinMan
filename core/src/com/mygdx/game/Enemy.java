@@ -2,10 +2,14 @@ package com.mygdx.game;
 
 
 
+import java.util.Random;
+
 import com.badlogic.gdx.math.Vector2;
 
 public class Enemy {
 	private Vector2 position;
+
+	Random rand = new Random();
 
 	DolphinMan dolphinMan;
 
@@ -19,72 +23,59 @@ public class Enemy {
 		return position;
 	}
 	
-	public int moveX(int x, float x_d,int mode){
-		if(mode==1){
-			if(x>=x_d){
-				return x-3;
-			}
-			else{
-				return x+9;
-			}
+	public int moveX(int x, int mode, int level){
+		if(mode==0){
+			return x-rand.nextInt(level+4)-1;
 		}
-		else if(mode==2){
-			if(x>=x_d){
-				return x-6;
-			}
-			else{
-				return x+3;
-			}
-		}
-		else if(mode==3){
-			if(x>=x_d){
-				return x-9;
-			}
-			else{
-				return x+3;
-			}
+		else if(mode==1){
+			return x-rand.nextInt(level+2)-1;
 		}
 		else{
-			if(x>=x_d){
-				return x-6;
-			}
-			else{
-				return x+3;
-			}
+			return x-rand.nextInt(level+7)-1;
 		}
 	}
 	
-	public int moveY(int y, float y_d,int mode){
-		if(mode==1){
-			if(y>=y_d){
-				return y-2;
+	public int moveY(int y, int mode, int bounce, int level){
+		if(bounce==0){
+			if(mode==0){
+				return y;
 			}
+			else if(mode==1){
+				if(y-5<0){
+					return 0;
+				}
+				else{
+					return y-rand.nextInt(level+7)-1;
+				}
+			}	
 			else{
-				return y+4;
-			}
-		}
-		else if(mode==2){
-			if(y>=y_d){
-				return y-4;
-			}
-			else{
-				return y+2;
-			}
-		}
-		else if(mode==3){
-			if(y>=y_d){
-				return y-6;
-			}
-			else{
-				return y+2;
+				if(y-4<0){
+					return 0;
+				}
+				else{
+					return y-rand.nextInt(level+2)-1;
+				}
 			}
 		}
 		else{
-			if(y>=y_d){
-				return y-2;
+			if(mode==0){
+				return y;
 			}
+			else if(mode==1){
+				if(y+5>768){
+					return 768;
+				}
+				else{
+					return y+rand.nextInt(level+7)+1;
+				}
+			}	
 			else{
-				return y+6;
+				if(y+4>768){
+					return 768;
+				}
+				else{
+					return y+rand.nextInt(level+2)+1;
+				}
 			}
 		}
 	}

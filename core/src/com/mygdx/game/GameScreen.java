@@ -33,12 +33,14 @@ public class GameScreen extends ScreenAdapter{
 	int x;
 	int spawn_count;
 	int spawn_start;
-	int multi;
+	int multi=2;
 	int start;
 	int max_count;
 	int bullet_mul;
 	int score;
 	int bullet_cal;
+	int monsterMode;
+	int level;
 	PointerInfo a;
 	Point b;
 	float dum;
@@ -46,17 +48,18 @@ public class GameScreen extends ScreenAdapter{
 	float mouseY;
 	int[] x_E = new int[100000];
 	int[] y_E = new int[100000];
-	int[] x_B = new int[1000];
-	int[] y_B = new int[1000];
-	int[] x_Brem = new int[1000];
-	int[] y_Brem = new int[1000];
-	int[] bX = new int[1000];
-	int[] bY = new int[1000];
+	int[] x_B = new int[100000];
+	int[] y_B = new int[100000];
+	int[] x_Brem = new int[100000];
+	int[] y_Brem = new int[100000];
+	int[] bX = new int[100000];
+	int[] bY = new int[100000];
 	int[] alive = new int[100000];
 	int[] bulletR = new int[1000];
 	int[] bulletS = new int[1000];
-	int[] bullet_calx = new int[1000];
-	int[] bullet_caly = new int[1000];
+	int[] bullet_calx = new int[100000];
+	int[] bullet_caly = new int[100000];
+	int[] bounce = new int[100000];
 	BitmapFont font = new BitmapFont();
 	Random rand = new Random();
 	
@@ -99,11 +102,6 @@ public class GameScreen extends ScreenAdapter{
 		mouseX = dum-470;
 		dum = (int) b.getY();
 		mouseY = 936-dum;
-		if(multi!=0){multi=1;}
-		for(int i=0;i<=spawn_count;i++){
-			if(multi==0){multi=1;break;}
-			multi=multi*2;
-		}
 	}
 	
 	public void monsterAction(){
@@ -142,24 +140,12 @@ public class GameScreen extends ScreenAdapter{
 	
 	public void spawnEnemy(){
 		if(start==0){
-			for(int i=0;i<multi;i++){				
-				int value1 = rand.nextInt(4) + 1;
-				if(value1==1){
-					x_E[i]=0;
-					y_E[i] = rand.nextInt(768) + 1;
-				}
-				else if(value1==2){
-					x_E[i]=0;
-					y_E[i] = rand.nextInt(1024) + 1;
-				}
-				else if(value1==3){
-					x_E[i]=1024;
-					y_E[i]= rand.nextInt(768) + 1;
-				}
-				else{
-					x_E[i]=0;
-					y_E[i] = rand.nextInt(1024) + 1;
-				}
+			if(multi<=28){
+				multi=multi+2;
+			}
+			for(int i=0;i<multi;i++){
+				x_E[i]=1024;
+				y_E[i]= rand.nextInt(768) + 1;
 				enemy[i] = new Enemy(x_E[i],y_E[i]);
 				alive[i] = 1;
 			}
@@ -171,23 +157,25 @@ public class GameScreen extends ScreenAdapter{
 	public void monsterMove(){
 		for(int i=0;i<multi;i++){
 			if(alive[i]==1){
-				Vector2 pos = dolphin.getPosition();
-				int value1 = rand.nextInt(4) + 1;
-				if(value1==1){
-					x_E[i]=enemy[i].moveX(x_E[i],pos.x,1);
-					y_E[i]=enemy[i].moveY(y_E[i],pos.y,1);
+				if(multi<=10){
+					level=3;
 				}
-				else if(value1==2){
-					x_E[i]=enemy[i].moveX(x_E[i],pos.x,2);
-					y_E[i]=enemy[i].moveY(y_E[i],pos.y,2);
-				}
-				else if(value1==3){
-					x_E[i]=enemy[i].moveX(x_E[i],pos.x,3);
-					y_E[i]=enemy[i].moveY(y_E[i],pos.y,3);
+				else if(multi>10 && multi<=20){
+					level=5;
 				}
 				else{
-					x_E[i]=enemy[i].moveX(x_E[i],pos.x,4);
-					y_E[i]=enemy[i].moveY(y_E[i],pos.y,4);
+					level=7;
+				}
+				x_E[i]=enemy[i].moveX(x_E[i],monsterMode,level);
+				if(y_E[i]==0){
+					bounce[i]=1;
+				}
+				if(y_E[i]==768){
+					bounce[i]=0;
+				}
+				y_E[i]=enemy[i].moveY(y_E[i],monsterMode,bounce[i],level);
+				if(x_E[i]<=0){
+					alive[i]=0;
 				}
 			}
 		}
@@ -273,7 +261,14 @@ public class GameScreen extends ScreenAdapter{
 	public void checkMonsterDeadAll(){
 		for(int i=0;i<multi;i++){
 			if(alive[i]==1){break;}
-			if(i==multi-1){start=0;System.out.println("Spawn");}
+			if(i==multi-1){
+				start=0;
+				monsterMode++;
+				if(monsterMode==3){
+					monsterMode=0;
+				}
+				System.out.println("Spawn");
+			}
 		}
 	}
 	
