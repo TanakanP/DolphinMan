@@ -6,9 +6,9 @@ public class Bullet {
 	private Vector2 position;
 
 	DolphinMan dolphinMan;
-	int calculate;
+	float calculate;
 
-	public Bullet(int x, int y){
+	public Bullet(float x, float y){
 		position = new Vector2(x,y);
 
 		
@@ -18,8 +18,8 @@ public class Bullet {
 		return position;
 	}
 	
-	public int move(int x_B, int bX, int y_B, int bY){
-		calculate=(int) Math.sqrt(((x_B-bX)*(x_B-bX))+((y_B-bY)*(y_B-bY)));
+	public float move(float x_B, float bX, float y_B, float bY){
+		calculate=(float) Math.sqrt(((x_B-bX)*(x_B-bX))+((y_B-bY)*(y_B-bY)));
 		return calculate;
 	}
 	

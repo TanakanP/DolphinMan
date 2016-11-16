@@ -9,7 +9,7 @@ public class DesktopLauncher {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.title = "Dolphin Man";
 		config.height = 768;
-		config.width = 1024;		
+		config.width = 1024;
 		new LwjglApplication(new DolphinMan(), config);
 	}
 }

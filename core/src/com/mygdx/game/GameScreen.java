@@ -41,7 +41,7 @@ public class GameScreen extends ScreenAdapter{
 	int max_count;
 	int bullet_mul;
 	int score;
-	int bullet_cal;
+	float bullet_cal;
 	int monsterMode;
 	int level;
 	int hp=10;
@@ -52,8 +52,8 @@ public class GameScreen extends ScreenAdapter{
 	float mouseY;
 	int[] x_E = new int[100000];
 	int[] y_E = new int[100000];
-	int[] x_B = new int[100000];
-	int[] y_B = new int[100000];
+	float[] x_B = new float[100000];
+	float[] y_B = new float[100000];
 	int[] x_Brem = new int[100000];
 	int[] y_Brem = new int[100000];
 	int[] bX = new int[100000];
@@ -61,8 +61,8 @@ public class GameScreen extends ScreenAdapter{
 	int[] alive = new int[100000];
 	int[] bulletR = new int[1000];
 	int[] bulletS = new int[1000];
-	int[] bullet_calx = new int[100000];
-	int[] bullet_caly = new int[100000];
+	float[] bullet_calx = new float[100000];
+	float[] bullet_caly = new float[100000];
 	int[] bounce = new int[100000];
 	BitmapFont font = new BitmapFont();
 	Random rand = new Random();
@@ -202,8 +202,8 @@ public class GameScreen extends ScreenAdapter{
 					y_B[i]=(int) pos.y;
 					x_Brem[i]=(int) pos.x;
 					y_Brem[i]=(int) pos.y;
-					bX[i]=Gdx.input.getX();
-					bY[i]=Gdx.input.getY();
+					bX[i]=Gdx.input.getX()+13;
+					bY[i]=Gdx.input.getY()-12;
 					bullet[i] = new Bullet(x_B[i],y_B[i]);
 					break;
 				}
