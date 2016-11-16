@@ -31,8 +31,12 @@ public class GameScreen extends ScreenAdapter{
 	Texture bulletDolphin;
 	Texture HPborder;
 	Texture HPbar;
+	Texture HPBossborder;
+	Texture HPBossbar;
+	Texture bossImg;
 	Enemy[] enemy;
 	Bullet[] bullet;
+	Boss boss;
 	int x;
 	int spawn_count;
 	int spawn_start;
@@ -45,6 +49,9 @@ public class GameScreen extends ScreenAdapter{
 	int monsterMode;
 	int level;
 	int hp=10;
+	int bossSpawn=0;
+	int BossX=1024;
+	int BossHP=380;
 	PointerInfo a;
 	Point b;
 	float dum;
@@ -86,6 +93,9 @@ public class GameScreen extends ScreenAdapter{
 		dummyMap = new Texture("MapSea.jpg");
 		HPborder = new Texture("HPborder.jpg");
 		HPbar = new Texture("HPbar.jpg");
+		bossImg = new Texture("SharkBoss.png");
+		HPBossborder = new Texture("HPBossborder.jpg");
+		HPBossbar = new Texture("HPBossbar.jpg");
 		mainTheme = Gdx.audio.newSound(Gdx.files.internal("MainTheme.mp3"));
 		mainTheme.play();
 
@@ -102,6 +112,7 @@ public class GameScreen extends ScreenAdapter{
 		monsterAction();
 		bulletAction();
 		checkStatus();
+		spawnBoss();
 	}
 
 	public void setUp(){
@@ -123,12 +134,14 @@ public class GameScreen extends ScreenAdapter{
 		bulletShoot();
 		bulletMove();
 		bulletHit();
+		bulletHitBoss();
 	}
 	
 	public void checkStatus(){
 		checkDolphinDead();
 		checkMonsterDeadAll();
 		checkEndgame();
+		checkBoss();
 	}
 	
 	public void dolphinMove(){
@@ -257,6 +270,19 @@ public class GameScreen extends ScreenAdapter{
 		}
 	}
 	
+	public void bulletHitBoss(){
+		for(int i=0;i<1000;i++){
+			if(bulletR[i]!=0){
+				if(x_B[i]+13>=BossX){
+					bulletR[i]=0;
+					bulletS[i]=0;
+					BossHP--;
+					break;
+				}
+			}	
+		}
+	}
+	
 	public void checkDolphinDead(){
 		for(int i=0;i<multi;i++){
 			Vector2 pos = dolphin.getPosition();
@@ -292,6 +318,19 @@ public class GameScreen extends ScreenAdapter{
 		}
 	}
 	
+	public void checkBoss(){
+		if(score==1){
+			bossSpawn=1;
+		}
+	}
+	
+	public void spawnBoss(){
+		if(bossSpawn!=0){
+			boss = new Boss(BossX,0);
+		}
+	}
+	
+	
 	public void draw(){
 		SpriteBatch batch = dolphinMan.batch;
 		batch.begin();
@@ -317,6 +356,16 @@ public class GameScreen extends ScreenAdapter{
 			batch.draw(HPbar,3+(i*30),3);
 		}
 		font.draw(batch, "HP", 10, 52);
+		if(bossSpawn==1){
+			if(BossX>=400){
+				BossX-=5;
+			}
+			batch.draw(bossImg,BossX,0);
+			batch.draw(HPBossborder,986,0);
+			for(int i=0;i<BossHP;i++){
+				batch.draw(HPBossbar,990,4+(2*i));
+			}
+		}
 		batch.end();
 	}
 	
