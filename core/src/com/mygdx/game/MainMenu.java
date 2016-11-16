@@ -11,19 +11,13 @@ public class MainMenu extends ScreenAdapter {
 	private DolphinMan dolphinMan;
 	Texture img;
 	public Sound mainSong;
-	Rectangle playButton;
-	Rectangle helpButton;
-	Rectangle exitButton;
 	int x,y;
 	
 	public MainMenu (DolphinMan dolphinMan) {
 		this.dolphinMan = dolphinMan;
-		img = new Texture("DolphinManMenu.png");
+		img = new Texture("DolphinManMenu_2.jpg");
 		mainSong = Gdx.audio.newSound(Gdx.files.internal("MainMenu.mp3"));
 		mainSong.play();
-		playButton = new Rectangle(796,409,61,47);
-		helpButton = new Rectangle(796,480,66,48);
-		exitButton = new Rectangle(796,556,58,47);
 	}
 	
 	public void update (){
@@ -31,23 +25,23 @@ public class MainMenu extends ScreenAdapter {
 			x=Gdx.input.getX();
 			y=Gdx.input.getY();
 			System.out.println(x + " " + y);
-			if (x>=796 && x<=857){
-				if(y>=409 && y<=456){
-				mainSong.dispose();
-				dolphinMan.setScreen(new GameScreen(dolphinMan));
-				return;
+			if (x>=1582 && x<=1704){
+				if(y>=435 && y<=549){
+					mainSong.dispose();
+					dolphinMan.setScreen(new GameScreen(dolphinMan));
+					return;
 				}
 			}
-			if (x>=796 && x<=862){
-				if(y>=480 && y<=528){
-				dolphinMan.setScreen(new HelpScreen(dolphinMan));
-				return;
+			if (x>=1582 && x<=1714){
+				if(y>=594 && y<=690){
+					dolphinMan.setScreen(new HelpScreen(dolphinMan));
+					return;
 				}
 			}
-			if (x>=796 && x<=853){
-				if(y>=556 && y<=603){
-				Gdx.app.exit();
-				return;
+			if (x>=1582 && x<=1696){
+				if(y>=750 && y<=844){
+					Gdx.app.exit();
+					return;
 				}
 			}
 		}

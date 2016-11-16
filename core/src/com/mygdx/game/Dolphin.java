@@ -30,9 +30,9 @@ public class Dolphin {
 	public void move(int dir){
 		position.x+=SPEED*DIR_OFFSETS[dir][0];
 		position.y+=SPEED*DIR_OFFSETS[dir][1];
-		if(position.x>954){position.x=954;}
+		if(position.x>1850){position.x=1850;}
 		if(position.x<0){position.x=0;}
-		if(position.y>698){position.y=698;}
+		if(position.y>1010){position.y=1010;}
 		if(position.y<0){position.y=0;}
 	}
 }
