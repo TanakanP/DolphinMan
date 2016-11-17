@@ -6,7 +6,6 @@ public class Bullet {
 	private Vector2 position;
 
 	DolphinMan dolphinMan;
-	float calculate;
 
 	public Bullet(float x, float y){
 		position = new Vector2(x,y);
@@ -18,9 +17,21 @@ public class Bullet {
 		return position;
 	}
 	
-	public float move(float x_B, float bX, float y_B, float bY){
-		calculate=(float) Math.sqrt(((x_B-bX)*(x_B-bX))+((y_B-bY)*(y_B-bY)));
-		return calculate;
+	public float moveX(float x, int mode){
+		if(mode==1){
+			return x+10;
+		}
+		else{
+			return x-20;
+		}
 	}
 	
+	public float moveY(float y, int mode){
+	    if(mode==3){
+			return y-5;
+		}
+		else{
+			return y+5;
+		}
+	}
 }

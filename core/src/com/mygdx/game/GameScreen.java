@@ -1,8 +1,5 @@
 package com.mygdx.game;
 
-import java.awt.MouseInfo;
-import java.awt.Point;
-import java.awt.PointerInfo;
 import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
@@ -27,7 +24,6 @@ public class GameScreen extends ScreenAdapter{
 	Texture dolphinRight;
 	Texture dolphinLeft;
 	Texture shark;
-	Texture crossHair;
 	Texture bulletDolphin;
 	Texture HPborder;
 	Texture HPbar;
@@ -38,52 +34,50 @@ public class GameScreen extends ScreenAdapter{
 	Texture EXPbar2;
 	Texture EXPbar3;
 	Texture bossImg;
+	Texture bossBulletImg;
 	Enemy[] enemy;
 	Bullet[] bullet;
 	Bullet[] bulletSpecial1;
 	Bullet[] bulletSpecial2;
+	Bullet[] bulletSpecial3;
+	Bullet[] bulletSpecial4;
+	Bullet[] bossBullet;
  	Boss boss;
-	int x;
-	int spawn_count;
-	int spawn_start;
 	int multi=2;
 	int start;
-	int max_count;
-	int bullet_mul;
 	int score;
-	float bullet_cal;
 	int monsterMode;
 	int level;
 	int hp=10;
 	int bossSpawn=0;
 	int BossX=1920;
-	int BossHP=536;
+	int BossHP=1076;
 	int exp=0;
 	int explvl=1;
-	PointerInfo a;
-	Point b;
-	float dum;
-	float mouseX;
-	float mouseY;
+	int bosslvl=50;
+	int onlyOneBoss=0;
 	int[] x_E = new int[100000];
 	int[] y_E = new int[100000];
+	long timer_start;
 	float[] x_B = new float[100000];
 	float[] y_B = new float[100000];
 	float[] x_Bsp1 = new float[10000];
 	float[] y_Bsp1 = new float[10000];
 	float[] x_Bsp2 = new float[10000];
 	float[] y_Bsp2 = new float[10000];
-	int[] x_Brem = new int[100000];
-	int[] y_Brem = new int[100000];
-	int[] bX = new int[100000];
-	int[] bY = new int[100000];
+	float[] x_Bsp3 = new float[10000];
+	float[] y_Bsp3 = new float[10000];
+	float[] x_Bsp4 = new float[10000];
+	float[] y_Bsp4 = new float[10000];
+	float[] x_B_boss = new float[10000];
+	float[] y_B_boss = new float[10000];
 	int[] alive = new int[100000];
-	int[] bulletR = new int[1000];
-	int[] bulletS = new int[1000];
+	int[] bulletR = new int[10000];
 	int[] bulletSpecialS1 = new int[10000];
 	int[] bulletSpecialS2 = new int[10000];
-	float[] bullet_calx = new float[100000];
-	float[] bullet_caly = new float[100000];
+	int[] bulletSpecialS3 = new int[10000];
+	int[] bulletSpecialS4 = new int[10000];
+	int[] bulletBossS = new int[10000];
 	int[] bounce = new int[100000];
 	BitmapFont font = new BitmapFont();
 	Random rand = new Random();
@@ -99,12 +93,14 @@ public class GameScreen extends ScreenAdapter{
 		dolphin = new Dolphin(100,100);
 		enemy = new Enemy[100000];
 		bullet = new Bullet[1000];
+		bossBullet = new Bullet[10000];
 		bulletSpecial1 = new Bullet[10000];
 		bulletSpecial2 = new Bullet[10000];
+		bulletSpecial3 = new Bullet[10000];
+		bulletSpecial4 = new Bullet[10000];
 		dolphinRight = new Texture("dolphinRight.png");
 		dolphinLeft = new Texture("dolphinLeft.png");
 		shark = new Texture("Shark.png");
-		crossHair = new Texture("crosshair.png");
 		bulletDolphin = new Texture("bulletDolphin.png");
 		dummyMap = new Texture("MapSea.jpg");
 		HPborder = new Texture("HPborder.jpg");
@@ -116,6 +112,8 @@ public class GameScreen extends ScreenAdapter{
 		EXPbar1 = new Texture("EXPbar1.jpg");
 		EXPbar2 = new Texture("EXPbar2.jpg");
 		EXPbar3 = new Texture("EXPbar3.jpg");
+		bossBulletImg = new Texture("bossBulletImg.png");
+		timer_start = System.currentTimeMillis();
 		mainTheme = Gdx.audio.newSound(Gdx.files.internal("MainTheme.mp3"));
 		mainTheme.play();
 
@@ -127,21 +125,11 @@ public class GameScreen extends ScreenAdapter{
 	}
 	
 	public void update(float delta){
-		setUp();
 		dolphinMove();
 		monsterAction();
 		bulletAction();
+		bossAction();
 		checkStatus();
-		spawnBoss();
-	}
-
-	public void setUp(){
-		a = MouseInfo.getPointerInfo();
-		b = a.getLocation();
-		dum = (int) b.getX();
-		mouseX = dum-20;
-		dum = (int) b.getY();
-		mouseY = 1060-dum;
 	}
 	
 	public void monsterAction(){
@@ -150,13 +138,10 @@ public class GameScreen extends ScreenAdapter{
 	}
 	
 	public void bulletAction(){
-		spawnBullet();
-		bulletShoot();
+		spawnBullet(explvl);
 		bulletMove();
 		bulletHitBoss();
 		bulletHit();
-		bulletSpecial(explvl);
-		bulletSpecialMove();
 	}
 	
 	public void checkStatus(){
@@ -165,6 +150,15 @@ public class GameScreen extends ScreenAdapter{
 		checkEndgame();
 		checkBoss();
 		checkEXP();
+		checkDolphinBoss();
+	}
+	
+	public void bossAction(){
+		spawnBoss();
+		if(bossSpawn==1){
+			bossAttackSpawn();
+			bossAttackMove();
+		}
 	}
 	
 	public void dolphinMove(){
@@ -176,17 +170,15 @@ public class GameScreen extends ScreenAdapter{
 		}
 		if(Gdx.input.isKeyPressed(Keys.A)){
 			dolphin.move(Dolphin.DIRECTION_LEFT);
-			x=1;
 		}
 		if(Gdx.input.isKeyPressed(Keys.D)){
 			dolphin.move(Dolphin.DIRECTION_RIGHT);
-			x=0;
 		}
 	}
 	
 	public void spawnEnemy(){
 		if(start==0){
-			if(multi<=28){
+			if(multi<=38){
 				multi=multi+2;
 			}
 			for(int i=0;i<multi;i++){
@@ -196,7 +188,6 @@ public class GameScreen extends ScreenAdapter{
 				alive[i] = 1;
 			}
 			start=1;
-			spawn_count++;
 		}
 	}
 	
@@ -207,10 +198,10 @@ public class GameScreen extends ScreenAdapter{
 					level=5;
 				}
 				else if(multi>10 && multi<=20){
-					level=7;
+					level=9;
 				}
 				else{
-					level=9;
+					level=13;
 				}
 				x_E[i]=enemy[i].moveX(x_E[i],monsterMode,level);
 				if(y_E[i]==0){
@@ -227,62 +218,170 @@ public class GameScreen extends ScreenAdapter{
 		}
 	}
 	
-	public void spawnBullet(){
-		if(Gdx.input.justTouched()){
-			for(int i=0;i<1000;i++){
+	public void spawnBullet(int lvl){
+		if(Gdx.input.isKeyJustPressed(Keys.SPACE)){
+			Vector2 pos = dolphin.getPosition();
+			for(int i=0;i<10000;i++){
 				if(bulletR[i]==0){
-					Vector2 pos = dolphin.getPosition();
 					bulletR[i]=1;
-					bulletS[i]=1;
-					x_B[i]=(int) pos.x;
-					y_B[i]=(int) pos.y;
-					x_Brem[i]=(int) pos.x;
-					y_Brem[i]=(int) pos.y;
-					bX[i]=Gdx.input.getX()+20;
-					bY[i]=Gdx.input.getY()-20;
+					x_B[i]=(int) pos.x+15;
+					y_B[i]=(int) pos.y+15;
 					bullet[i] = new Bullet(x_B[i],y_B[i]);
 					break;
 				}
 			}
-		}
-	}
-	
-	public void bulletShoot(){
-		for(int i=0;i<1000;i++){
-			if(bulletS[i]!=0){
-				bullet_cal=((bullet[i].move(x_Brem[i],bX[i],y_Brem[i],bY[i]))/10);
-				bullet_calx[i]=Math.abs(((x_Brem[i]-bX[i])/bullet_cal));
-				bullet_caly[i]=Math.abs(((y_Brem[i]-bY[i])/bullet_cal));
-				bulletS[i]=0;
-				
+			if(lvl>=2){
+				for(int i=0;i<10000;i++){
+					if(bulletSpecialS1[i]==0){
+						bulletSpecialS1[i]=1;
+						bulletSpecial1[i] = new Bullet(0,0);
+						x_Bsp1[i]=pos.x+15;
+						y_Bsp1[i]=pos.y+60;
+						break;
+					}
+				}
+			}
+			if(lvl>=3){
+				for(int i=0;i<10000;i++){
+					if(bulletSpecialS2[i]==0){
+						bulletSpecialS2[i]=1;
+						bulletSpecial2[i] = new Bullet(0,0);
+						x_Bsp2[i]=pos.x+15;
+						y_Bsp2[i]=pos.y-30;
+						break;
+					}
+				}
+			}
+			if(lvl>=4){
+				for(int i=0;i<10000;i++){
+					if(bulletSpecialS3[i]==0){
+						bulletSpecialS3[i]=1;
+						bulletSpecial3[i] = new Bullet(0,0);
+						x_Bsp3[i]=pos.x+15;
+						y_Bsp3[i]=pos.y+15;
+						break;
+					}
+				}
+				for(int i=0;i<10000;i++){
+					if(bulletSpecialS4[i]==0){
+						bulletSpecialS4[i]=1;
+						bulletSpecial4[i] = new Bullet(0,0);
+						x_Bsp4[i]=pos.x+15;
+						y_Bsp4[i]=pos.y+15;
+						break;
+					}
+				}
 			}
 		}
+		
 	}
 	
 	public void bulletMove(){
-		for(int i=0;i<1000;i++){
+		for(int i=0;i<10000;i++){
 			if(bulletR[i]!=0){
-				if(x_Brem[i]>bX[i]){x_B[i]-=bullet_calx[i];}
-				else if(x_Brem[i]<=bX[i]){x_B[i]+=bullet_calx[i];}
-				if(y_Brem[i]>bY[i]){y_B[i]+=bullet_caly[i];}
-				else if(y_Brem[i]<=bY[i]){y_B[i]-=bullet_caly[i];}
-				
-				if(x_B[i]<=0 || x_B[i]>=1920){bulletR[i]=0;bulletS[i]=0;}
-				if(y_B[i]<=0 || y_B[i]>=1080){bulletR[i]=0;bulletS[i]=0;} 
+				x_B[i]=bullet[i].moveX(x_B[i],1);
+			}
+			if(bulletSpecialS1[i]!=0){
+				x_Bsp1[i]=bulletSpecial1[i].moveX(x_Bsp1[i],1);
+			}
+			if(bulletSpecialS2[i]!=0){
+				x_Bsp2[i]=bulletSpecial2[i].moveX(x_Bsp2[i],1);
+			}
+			if(bulletSpecialS3[i]!=0){
+				x_Bsp3[i]=bulletSpecial3[i].moveX(x_Bsp3[i],1);
+				y_Bsp3[i]=bulletSpecial3[i].moveY(y_Bsp3[i],3);
+			}
+			if(bulletSpecialS4[i]!=0){
+				x_Bsp4[i]=bulletSpecial4[i].moveX(x_Bsp4[i],1);
+				y_Bsp4[i]=bulletSpecial4[i].moveY(y_Bsp4[i],4);
+			}
+			if(x_B[i]>=1920){
+				bulletR[i]=0;
+			}
+			if(x_Bsp1[i]>=1920){
+				bulletSpecialS1[i]=0;
+			}
+			if(x_Bsp2[i]>=1920){
+				bulletSpecialS2[i]=0;
+			}
+			if(x_Bsp3[i]>=1920){
+				bulletSpecialS3[i]=0;
+			}
+			if(x_Bsp4[i]>=1920){
+				bulletSpecialS4[i]=0;
 			}
 		}
 	}
 	
 	public void bulletHit(){
-		for(int i=0;i<1000;i++){
+		for(int i=0;i<10000;i++){
 			if(bulletR[i]!=0){
 				for(int j=0;j<multi;j++){
 					if(alive[j]!=0){
-						if(x_B[i]+13>=x_E[j]+20 && x_B[i]+13<=x_E[j]+55){
-							if(y_B[i]+13>=y_E[j]+18 && y_B[i]+13<=y_E[j]+52){
+						if(x_B[i]+13>=x_E[j]+20 && x_B[i]+13<=x_E[j]+65){
+							if(y_B[i]+13>=y_E[j]+3 && y_B[i]+13<=y_E[j]+56){
 								alive[j]=0;
 								bulletR[i]=0;
-								bulletS[i]=0;
+								score++;
+								exp++;
+								break;
+							}
+						}
+					}
+				}
+			}
+			if(bulletSpecialS1[i]!=0){
+				for(int j=0;j<multi;j++){
+					if(alive[j]!=0){
+						if(x_Bsp1[i]+13>=x_E[j]+20 && x_Bsp1[i]+13<=x_E[j]+65){
+							if(y_Bsp1[i]+13>=y_E[j]+3 && y_Bsp1[i]+13<=y_E[j]+56){
+								alive[j]=0;
+								bulletSpecialS1[i]=0;
+								score++;
+								exp++;
+								break;
+							}
+						}
+					}
+				}
+			}
+			if(bulletSpecialS2[i]!=0){
+				for(int j=0;j<multi;j++){
+					if(alive[j]!=0){
+						if(x_Bsp2[i]+13>=x_E[j]+20 && x_Bsp2[i]+13<=x_E[j]+65){
+							if(y_Bsp2[i]+13>=y_E[j]+3 && y_Bsp2[i]+13<=y_E[j]+56){
+								alive[j]=0;
+								bulletSpecialS2[i]=0;
+								score++;
+								exp++;
+								break;
+							}
+						}
+					}
+				}
+			}
+			if(bulletSpecialS3[i]!=0){
+				for(int j=0;j<multi;j++){
+					if(alive[j]!=0){
+						if(x_Bsp3[i]+13>=x_E[j]+20 && x_Bsp3[i]+13<=x_E[j]+65){
+							if(y_Bsp3[i]+13>=y_E[j]+3 && y_Bsp3[i]+13<=y_E[j]+56){
+								alive[j]=0;
+								bulletSpecialS3[i]=0;
+								score++;
+								exp++;
+								break;
+							}
+						}
+					}
+				}
+			}
+			if(bulletSpecialS4[i]!=0){
+				for(int j=0;j<multi;j++){
+					if(alive[j]!=0){
+						if(x_Bsp4[i]+13>=x_E[j]+20 && x_Bsp4[i]+13<=x_E[j]+65){
+							if(y_Bsp4[i]+13>=y_E[j]+3 && y_Bsp4[i]+13<=y_E[j]+56){
+								alive[j]=0;
+								bulletSpecialS4[i]=0;
 								score++;
 								exp++;
 								break;
@@ -299,33 +398,113 @@ public class GameScreen extends ScreenAdapter{
 			if(bulletR[i]!=0){
 				if(y_B[i]+13>=862 && x_B[i]+13>=BossX+176){
 					bulletR[i]=0;
-					bulletS[i]=0;
 					BossHP--;
-					break;
 				}
 				if(y_B[i]+13>=546 && y_B[i]+13<862){
 					if(x_B[i]+13>=BossX){
 						bulletR[i]=0;
-						bulletS[i]=0;
 						BossHP--;
-						break;
 					}
 				}
 				if(y_B[i]+13>=344 && y_B[i]+13<546){
 					if(x_B[i]+13>=BossX+255){
 						bulletR[i]=0;
-						bulletS[i]=0;
 						BossHP--;
-						break;
 					}
 				}
 				if(y_B[i]+13<344 && x_B[i]+13>=BossX+600){
 					bulletR[i]=0;
-					bulletS[i]=0;
 					BossHP--;
-					break;
 				}
 			}	
+			if(bulletSpecialS1[i]!=0){
+				if(y_Bsp1[i]+13>=862 && x_Bsp1[i]+13>=BossX+176){
+					bulletSpecialS1[i]=0;
+					BossHP--;
+				}
+				if(y_Bsp1[i]+13>=546 && y_Bsp1[i]+13<862){
+					if(x_Bsp1[i]+13>=BossX){
+						bulletSpecialS1[i]=0;
+						BossHP--;
+					}
+				}
+				if(y_Bsp1[i]+13>=344 && y_Bsp1[i]+13<546){
+					if(x_Bsp1[i]+13>=BossX+255){
+						bulletSpecialS1[i]=0;
+						BossHP--;
+					}
+				}
+				if(y_Bsp1[i]+13<344 && x_Bsp1[i]+13>=BossX+600){
+					bulletSpecialS1[i]=0;
+					BossHP--;
+				}
+			}
+			if(bulletSpecialS2[i]!=0){
+				if(y_Bsp2[i]+13>=862 && x_Bsp2[i]+13>=BossX+176){
+					bulletSpecialS2[i]=0;
+					BossHP--;
+				}
+				if(y_Bsp2[i]+13>=546 && y_Bsp2[i]+13<862){
+					if(x_Bsp2[i]+13>=BossX){
+						bulletSpecialS2[i]=0;
+						BossHP--;
+					}
+				}
+				if(y_Bsp2[i]+13>=344 && y_Bsp2[i]+13<546){
+					if(x_Bsp2[i]+13>=BossX+255){
+						bulletSpecialS2[i]=0;
+						BossHP--;
+					}
+				}
+				if(y_Bsp2[i]+13<344 && x_Bsp2[i]+13>=BossX+600){
+					bulletSpecialS2[i]=0;
+					BossHP--;
+				}
+			}
+			if(bulletSpecialS3[i]!=0){
+				if(y_Bsp3[i]+13>=862 && x_Bsp3[i]+13>=BossX+176){
+					bulletSpecialS3[i]=0;
+					BossHP--;
+				}
+				if(y_Bsp3[i]+13>=546 && y_Bsp3[i]+13<862){
+					if(x_Bsp3[i]+13>=BossX){
+						bulletSpecialS3[i]=0;
+						BossHP--;
+					}
+				}
+				if(y_Bsp3[i]+13>=344 && y_Bsp3[i]+13<546){
+					if(x_Bsp3[i]+13>=BossX+255){
+						bulletSpecialS3[i]=0;
+						BossHP--;
+					}
+				}
+				if(y_Bsp3[i]+13<344 && x_Bsp3[i]+13>=BossX+600){
+					bulletSpecialS3[i]=0;
+					BossHP--;
+				}
+			}
+			if(bulletSpecialS4[i]!=0){
+				if(y_Bsp4[i]+13>=862 && x_Bsp4[i]+13>=BossX+176){
+					bulletSpecialS4[i]=0;
+					BossHP--;
+				}
+				if(y_Bsp4[i]+13>=546 && y_Bsp4[i]+13<862){
+					if(x_Bsp4[i]+13>=BossX){
+						bulletSpecialS4[i]=0;
+						BossHP--;
+					}
+				}
+				if(y_Bsp4[i]+13>=344 && y_Bsp4[i]+13<546){
+					if(x_Bsp4[i]+13>=BossX+255){
+						bulletSpecialS4[i]=0;
+						BossHP--;
+					}
+				}
+				if(y_Bsp4[i]+13<344 && x_Bsp4[i]+13>=BossX+600){
+					bulletSpecialS4[i]=0;
+					BossHP--;
+				}
+			}
 		}
 	}
 	
@@ -338,9 +517,40 @@ public class GameScreen extends ScreenAdapter{
 					y_E[i]=0;
 					x_E[i]=0;
 					hp--;
-					System.out.print("DIE");
 				}
 			}
+		}
+		for(int i=0;i<10000;i++){
+			Vector2 pos = dolphin.getPosition();
+			if(bulletBossS[i]!=0){
+				if(x_B_boss[i]+8<=pos.x+50 && x_B_boss[i]+8>=pos.x+5){
+					if(y_B_boss[i]+10>=pos.y+16 && y_B_boss[i]+10<=pos.y+57){
+						bulletBossS[i]=0;
+						hp--;
+						break;
+					}
+				}					
+			}
+		}
+	}
+	
+	public void checkDolphinBoss(){
+		Vector2 pos = dolphin.getPosition();
+		if(pos.y+47>=862 && pos.x+50>=BossX+176){
+			hp=0;
+		}
+		if(pos.y+47>=546 && pos.y+47<862){
+			if(pos.x+50>=BossX){
+				hp=0;
+			}
+		}
+		if(pos.y+47>=344 && pos.y+47<546){
+			if(pos.x+50>=BossX+255){
+				hp=0;
+			}
+		}
+		if(pos.y+47<344 && pos.x+50>=BossX+600){
+			hp=0;
 		}
 	}
 	
@@ -360,19 +570,63 @@ public class GameScreen extends ScreenAdapter{
 	
 	public void checkEndgame(){
 		if(hp==0){
+			mainTheme.dispose();
 			dolphinMan.setScreen(new GameOver(dolphinMan));
+		}
+		if(BossHP<=0){
+			mainTheme.dispose();
+			dolphinMan.setScreen(new GameClear(dolphinMan));
 		}
 	}
 	
 	public void checkBoss(){
-		if(score==1){
+		if(score>=500){
 			bossSpawn=1;
 		}
 	}
 	
 	public void spawnBoss(){
-		if(bossSpawn!=0){
+		if(bossSpawn!=0 && onlyOneBoss!=1){
 			boss = new Boss(BossX,0);
+			for(int i=0;i<10000;i++){
+				bulletR[i]=0;
+				bulletSpecialS1[i]=0;
+				bulletSpecialS2[i]=0;
+				bulletSpecialS3[i]=0;
+				bulletSpecialS4[i]=0;
+			}
+			onlyOneBoss=1;
+		}
+	}
+	
+	public void bossAttackSpawn(){
+		if(BossHP<500 && BossHP>=150){
+			bosslvl=100;
+		}
+		if(BossHP<150){
+			bosslvl=150;
+		}
+		if((System.currentTimeMillis()-timer_start)%500>=0 && (System.currentTimeMillis()-timer_start)%500<=bosslvl){
+			for(int i=0;i<10000;i++){
+				if(bulletBossS[i]==0){
+					bulletBossS[i]=1;
+					x_B_boss[i]=1920;
+					y_B_boss[i]=rand.nextInt(1080);
+					bossBullet[i] = new Bullet(x_B_boss[i],y_B_boss[i]);
+					break;
+				}
+			}
+		}
+	}
+	
+	public void bossAttackMove(){
+		for(int i=0;i<10000;i++){
+			if(bulletBossS[i]!=0){
+				x_B_boss[i]=bossBullet[i].moveX(x_B_boss[i],0);
+				if(x_B_boss[i]<=0){
+					bulletBossS[i]=0;
+				}
+			}
 		}
 	}
 	
@@ -389,52 +643,15 @@ public class GameScreen extends ScreenAdapter{
 				explvl=3;
 			}
 		}
-		else if(explvl==3){
+		else if(explvl>=3){
 			if(exp>=100){
-				exp=0;
-				explvl=0;
+				exp=100;
+				explvl=4;
 			}
 		}
 		else{
 		}
 	}
-	
-	public void bulletSpecial(int lvl){
-		if(lvl==2){
-			for(int i=0;i<10000;i++){
-				if(bulletSpecialS1[i]==0 && bulletSpecialS2[i]==0){
-					if(Gdx.input.justTouched()){
-					Vector2 pos = dolphin.getPosition();
-					bulletSpecialS1[i]=1;
-					bulletSpecialS2[i]=1;
-					bulletSpecial1[i] = new Bullet(0,0);
-					bulletSpecial2[i] = new Bullet(0,0);
-					x_Bsp1[i]=pos.x+35;
-					y_Bsp1[i]=pos.y+35;
-					x_Bsp2[i]=pos.x+35;
-					y_Bsp2[i]=pos.y+35;
-					break;
-					}
-				}
-			}
-		}
-	}
-	
-	public void bulletSpecialMove(){
-		for(int i=0;i<10000;i++){
-			if(bulletSpecialS1[i]!=0){
-				x_Bsp1[i]=x_Bsp1[i]+5;
-				y_Bsp1[i]=y_Bsp1[i]-5;
-			}
-			if(bulletSpecialS2[i]!=0){
-				x_Bsp2[i]=x_Bsp2[i]+5;
-				y_Bsp2[i]=y_Bsp2[i]+5;
-			}
-		}
-	}
-	
-	
-	
 	
 	public void draw(){
 		SpriteBatch batch = dolphinMan.batch;
@@ -452,6 +669,13 @@ public class GameScreen extends ScreenAdapter{
 				batch.draw(bulletDolphin,x_B[i],y_B[i]);
 			}
 		}
+		if(bossSpawn==1){
+			for(int i=0;i<10000;i++){
+				if(bulletBossS[i]!=0){
+					batch.draw(bossBulletImg,x_B_boss[i],y_B_boss[i]);
+				}
+			}
+		}
 		for(int i=0;i<10000;i++){
 			if(bulletSpecialS1[i]!=0){
 				batch.draw(bulletDolphin,x_Bsp1[i],y_Bsp1[i]);
@@ -459,14 +683,19 @@ public class GameScreen extends ScreenAdapter{
 			if(bulletSpecialS2[i]!=0){
 				batch.draw(bulletDolphin,x_Bsp2[i],y_Bsp2[i]);
 			}
+			if(bulletSpecialS3[i]!=0){
+				batch.draw(bulletDolphin,x_Bsp3[i],y_Bsp3[i]);
+			}
+			if(bulletSpecialS4[i]!=0){
+				batch.draw(bulletDolphin,x_Bsp4[i],y_Bsp4[i]);
+			}
 		}
-		if(x==1){batch.draw(dolphinLeft,pos.x,pos.y);}
-		else{batch.draw(dolphinRight,pos.x,pos.y);}
+		batch.draw(dolphinRight,pos.x,pos.y);
 		batch.draw(HPborder,0,0);
 		for(int i=0;i<hp;i++){
 			batch.draw(HPbar,3+(i*30),3);
 		}
-		font.draw(batch, "HP", 10, 52);
+		font.draw(batch, "HP: "+hp+"/10", 10, 52);
 		batch.draw(EXPborder,326,0);
 		if(explvl==1){
 			for(int i=0;i<exp;i++){
@@ -478,23 +707,27 @@ public class GameScreen extends ScreenAdapter{
 				batch.draw(EXPbar2,329+(i*6),3);
 			}
 		}
-		else if(explvl==3){
+		else if(explvl>=3){
 			for(int i=0;i<exp;i++){
 				batch.draw(EXPbar3,329+(i*3),3);
 			}
 		}
-		font.draw(batch, "EXP", 336, 52);
+		if(explvl<4){
+			font.draw(batch, "EXP-LEVEL: "+explvl, 336, 52);
+		}
+		else{
+			font.draw(batch, "EXP-LEVEL: MAX", 336, 52);
+		}
 		if(bossSpawn==1){
 			if(BossX>=1000){
-				BossX-=5;
+				BossX-=15;
 			}
 			batch.draw(bossImg,BossX,0);
 			batch.draw(HPBossborder,1882,0);
 			for(int i=0;i<BossHP;i++){
-				batch.draw(HPBossbar,1886,4+(2*i));
+				batch.draw(HPBossbar,1886,4+(i));
 			}
 		}
-		batch.draw(crossHair,mouseX,mouseY);
 		batch.end();
 	}
 	

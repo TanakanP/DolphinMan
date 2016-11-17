@@ -16,7 +16,7 @@ public class Dolphin {
 		{0,-1},
 		{-1,0}
 	};
-	public static final int SPEED = 5;
+	public static final int SPEED = 8;
 	
 	public Dolphin(int x,int y){
 		position = new Vector2(x,y);

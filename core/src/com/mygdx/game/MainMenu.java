@@ -28,12 +28,13 @@ public class MainMenu extends ScreenAdapter {
 			if (x>=1582 && x<=1704){
 				if(y>=435 && y<=549){
 					mainSong.dispose();
-					dolphinMan.setScreen(new GameScreen(dolphinMan));
+					dolphinMan.setScreen(new Loading(dolphinMan));
 					return;
 				}
 			}
 			if (x>=1582 && x<=1714){
 				if(y>=594 && y<=690){
+					mainSong.dispose();
 					dolphinMan.setScreen(new HelpScreen(dolphinMan));
 					return;
 				}

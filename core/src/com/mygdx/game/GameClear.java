@@ -6,20 +6,20 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-public class HelpScreen extends ScreenAdapter {
+public class GameClear extends ScreenAdapter {
 	DolphinMan dolphinMan;
-	Texture HelpScreen;
+	Texture gameClear;
 	int x,y;
 	
-	public HelpScreen (DolphinMan dolphinMan) {
+	public GameClear (DolphinMan dolphinMan) {
 		this.dolphinMan = dolphinMan;
-		HelpScreen = new Texture("HelpScreen.jpg");
+		gameClear = new Texture("GameClear.jpg");
 	}
 	
 	public void draw(){
 		SpriteBatch batch = dolphinMan.batch;
 		batch.begin();
-		batch.draw(HelpScreen,0,0);
+		batch.draw(gameClear,0,0);
 		batch.end();
 	}
 	
@@ -28,9 +28,15 @@ public class HelpScreen extends ScreenAdapter {
 			x=Gdx.input.getX();
 			y=Gdx.input.getY();
 			System.out.println(x + " " + y);
-			if (x>=1531 && x<=1691){
-				if(y>=799 && y<=927){
+			if (x>=1365 && x<=1530){
+				if(y>=549 && y<=680){
 					dolphinMan.setScreen(new MainMenu(dolphinMan));
+					return;
+				}
+			}
+			if (x>=1365 && x<=1511){
+				if(y>=716 && y<=846){
+					Gdx.app.exit();
 					return;
 				}
 			}
