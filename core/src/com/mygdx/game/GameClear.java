@@ -28,14 +28,14 @@ public class GameClear extends ScreenAdapter {
 			x=Gdx.input.getX();
 			y=Gdx.input.getY();
 			System.out.println(x + " " + y);
-			if (x>=1365 && x<=1530){
-				if(y>=549 && y<=680){
+			if (x>=972 && x<=1086){
+				if(y>=394 && y<=484){
 					dolphinMan.setScreen(new MainMenu(dolphinMan));
 					return;
 				}
 			}
-			if (x>=1365 && x<=1511){
-				if(y>=716 && y<=846){
+			if (x>=973 && x<=1071){
+				if(y>=511 && y<=596){
 					Gdx.app.exit();
 					return;
 				}

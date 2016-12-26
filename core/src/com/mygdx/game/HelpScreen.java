@@ -28,8 +28,8 @@ public class HelpScreen extends ScreenAdapter {
 			x=Gdx.input.getX();
 			y=Gdx.input.getY();
 			System.out.println(x + " " + y);
-			if (x>=1531 && x<=1691){
-				if(y>=799 && y<=927){
+			if (x>=1090 && x<=1200){
+				if(y>=572 && y<=661){
 					dolphinMan.setScreen(new MainMenu(dolphinMan));
 					return;
 				}

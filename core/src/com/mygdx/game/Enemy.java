@@ -62,16 +62,16 @@ public class Enemy {
 				return y;
 			}
 			else if(mode==1){
-				if(y+5>1080){
-					return 1080;
+				if(y+5>768){
+					return 768;
 				}
 				else{
 					return y+rand.nextInt(level+7)+1;
 				}
 			}	
 			else{
-				if(y+4>1080){
-					return 1080;
+				if(y+4>768){
+					return 768;
 				}
 				else{
 					return y+rand.nextInt(level+2)+1;

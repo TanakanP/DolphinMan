@@ -44,8 +44,8 @@ public class World{
 	int level;
 	int hp=10;
 	int bossSpawn=0;
-	int BossX=1920;
-	int BossHP=1076;
+	int BossX=1366;
+	int BossHP=760;
 	int exp=0;
 	int explvl=1;
 	int bosslvl=50;
@@ -165,8 +165,8 @@ public class World{
 				multi=multi+2;
 			}
 			for(int i=0;i<multi;i++){
-				x_E[i]=1920;
-				y_E[i]= rand.nextInt(1080) + 1;
+				x_E[i]=1366;
+				y_E[i]= rand.nextInt(768) + 1;
 				enemy[i] = new Enemy(x_E[i],y_E[i]);
 				alive[i] = 1;
 			}
@@ -190,7 +190,7 @@ public class World{
 				if(y_E[i]==0){
 					bounce[i]=1;
 				}
-				if(y_E[i]==1080){
+				if(y_E[i]==768){
 					bounce[i]=0;
 				}
 				y_E[i]=enemy[i].moveY(y_E[i],monsterMode,bounce[i],level);
@@ -278,19 +278,19 @@ public class World{
 				x_Bsp4[i]=bulletSpecial4[i].moveX(x_Bsp4[i],1);
 				y_Bsp4[i]=bulletSpecial4[i].moveY(y_Bsp4[i],4);
 			}
-			if(x_B[i]>=1920){
+			if(x_B[i]>=1366){
 				bulletR[i]=0;
 			}
-			if(x_Bsp1[i]>=1920){
+			if(x_Bsp1[i]>=1366){
 				bulletSpecialS1[i]=0;
 			}
-			if(x_Bsp2[i]>=1920){
+			if(x_Bsp2[i]>=1366){
 				bulletSpecialS2[i]=0;
 			}
-			if(x_Bsp3[i]>=1920){
+			if(x_Bsp3[i]>=1366){
 				bulletSpecialS3[i]=0;
 			}
-			if(x_Bsp4[i]>=1920){
+			if(x_Bsp4[i]>=1366){
 				bulletSpecialS4[i]=0;
 			}
 		}
@@ -593,8 +593,8 @@ public class World{
 			for(int i=0;i<10000;i++){
 				if(bulletBossS[i]==0){
 					bulletBossS[i]=1;
-					x_B_boss[i]=1920;
-					y_B_boss[i]=rand.nextInt(1080);
+					x_B_boss[i]=1366;
+					y_B_boss[i]=rand.nextInt(768);
 					bossBullet[i] = new Bullet(x_B_boss[i],y_B_boss[i]);
 					break;
 				}
@@ -605,7 +605,7 @@ public class World{
 	public void bossAttackMove(){
 		for(int i=0;i<10000;i++){
 			if(bulletBossS[i]!=0){
-				x_B_boss[i]=bossBullet[i].moveX(x_B_boss[i],0);
+				x_B_boss[i]=bossBullet[i].moveX(x_B_boss[i]+10,0);
 				if(x_B_boss[i]<=0){
 					bulletBossS[i]=0;
 				}

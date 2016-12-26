@@ -26,7 +26,8 @@ public class WorldRenderer {
 		Vector2 pos = dolphin.getPosition();
 		batch.draw(world.dummyMap,0,0);		
 		batch.draw(world.dolphinRight,pos.x,pos.y);
-		font.draw(batch, "Shark Eliminated: "+world.score, 10, 1060);
+		font.draw(batch, "Mission: Eliminate 500 shark and Kill King Shark", 10, 763);
+		font.draw(batch, "Shark Eliminated: "+world.score, 10, 748);
 		for(int i=0;i<world.multi;i++){
 			if(world.alive[i]!=0){
 				batch.draw(world.shark,world.x_E[i],world.y_E[i]);
@@ -86,13 +87,13 @@ public class WorldRenderer {
 			font.draw(batch, "EXP-LEVEL: MAX", 336, 52);
 		}
 		if(world.bossSpawn==1){
-			if(world.BossX>=1000){
+			if(world.BossX>=711){
 				world.BossX-=15;
 			}
 			batch.draw(world.bossImg,world.BossX,0);
-			batch.draw(world.HPBossborder,1882,0);
+			batch.draw(world.HPBossborder,1328,0);
 			for(int i=0;i<world.BossHP;i++){
-				batch.draw(world.HPBossbar,1886,4+(i));
+				batch.draw(world.HPBossbar,1332,4+(i));
 			}
 		}
 		batch.end();

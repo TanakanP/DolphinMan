@@ -25,22 +25,22 @@ public class MainMenu extends ScreenAdapter {
 			x=Gdx.input.getX();
 			y=Gdx.input.getY();
 			System.out.println(x + " " + y);
-			if (x>=1582 && x<=1704){
-				if(y>=435 && y<=549){
+			if (x>=1125 && x<=1210){
+				if(y>=325 && y<=390){
 					mainSong.dispose();
 					dolphinMan.setScreen(new Loading(dolphinMan));
 					return;
 				}
 			}
-			if (x>=1582 && x<=1714){
-				if(y>=594 && y<=690){
+			if (x>=1125 && x<=1212){
+				if(y>=425 && y<=490){
 					mainSong.dispose();
 					dolphinMan.setScreen(new HelpScreen(dolphinMan));
 					return;
 				}
 			}
-			if (x>=1582 && x<=1696){
-				if(y>=750 && y<=844){
+			if (x>=1127 && x<=1201){
+				if(y>=532 && y<=599){
 					Gdx.app.exit();
 					return;
 				}

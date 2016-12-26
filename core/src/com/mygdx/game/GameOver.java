@@ -28,14 +28,14 @@ public class GameOver extends ScreenAdapter {
 			x=Gdx.input.getX();
 			y=Gdx.input.getY();
 			System.out.println(x + " " + y);
-			if (x>=1365 && x<=1571){
-				if(y>=549 && y<=680){
+			if (x>=970 && x<=1114){
+				if(y>=393 && y<=482){
 					dolphinMan.setScreen(new Loading(dolphinMan));
 					return;
 				}
 			}
-			if (x>=1365 && x<=1511){
-				if(y>=716 && y<=846){
+			if (x>=973 && x<=1070){
+				if(y>=513 && y<=602){
 					Gdx.app.exit();
 					return;
 				}

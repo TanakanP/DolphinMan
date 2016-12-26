@@ -8,9 +8,9 @@ public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.title = "Dolphin Man";
-		config.height = 1080;
-		config.width = 1920;
-		config.fullscreen = true;
+		config.height = 768;
+		config.width = 1366;
+		config.fullscreen = false;
 		new LwjglApplication(new DolphinMan(), config);
 	}
 }
